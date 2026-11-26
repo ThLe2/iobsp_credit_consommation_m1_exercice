@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exercice d'entraînement — module 1</title>
+<style>
+:root{
+  --prune:#8C1E70; --prune-fonce:#5E1349; --prune-clair:#F4E6EE; --accent:#C77BAA;
+  --vert:#283C28; --gris:#3C3C3C; --gris-moyen:#8A7A85; --filet:#E8DCE5;
+  --creme:#FAF6F8; --blanc:#FFFFFF;
+  --ok:#2F7A4F; --ko:#B23B3B; --amb:#B5852A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--creme);color:var(--gris);
+  font-family:"Nunito","Segoe UI",Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;
+  -webkit-user-select:none;-moz-user-select:none;user-select:none}
+.wrap{max-width:900px;margin:0 auto;padding:0 18px 60px}
+header.bandeau{background:var(--prune-fonce);color:#fff;padding:18px 0;border-bottom:4px solid var(--accent)}
+header.bandeau .wrap{padding-bottom:0}
+.chapitre{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#EAD3E3}
+.chapitre span{color:var(--accent);margin:0 6px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:27px;line-height:1.25;margin:8px 0 4px;color:#fff}
+.sous{color:#EAD3E3;font-size:14.5px;margin:0}
+.consigne{background:var(--prune-clair);border-left:5px solid var(--prune);
+  padding:14px 18px;border-radius:0 8px 8px 0;margin:26px 0 8px;font-size:15px}
+.consigne b{color:var(--prune-fonce)}
+.carte{background:#fff;border:1px solid var(--filet);border-radius:10px;padding:20px 22px;margin:18px 0;
+  box-shadow:0 1px 2px rgba(94,19,73,.05)}
+.carte.masque{display:none}
+.etiq{display:inline-block;background:var(--prune-clair);color:var(--prune-fonce);
+  font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;padding:3px 10px;border-radius:11px;
+  font-weight:700;margin-bottom:10px}
+.enonce{font-weight:700;color:var(--vert);font-size:16.5px;margin:0 0 12px}
+.scenario{background:#FCF9FB;border:1px dashed var(--filet);border-radius:8px;padding:14px 16px;
+  margin:0 0 14px;font-size:15px}
+.scenario b{color:var(--prune-fonce)}
+.opts{list-style:none;margin:0;padding:0}
+.opts li{margin:7px 0}
+.opts label{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border:1.5px solid var(--filet);
+  border-radius:8px;cursor:pointer;background:#fff;transition:border-color .12s,background .12s}
+.opts label:hover{border-color:var(--accent);background:#FDF9FC}
+.opts input{margin-top:4px;accent-color:var(--prune);flex:0 0 auto}
+.opts label.bonne{border-color:var(--ok);background:#F1F8F3}
+.opts label.mauvaise{border-color:var(--ko);background:#FBF2F2}
+.fb{margin-top:14px;padding:13px 16px;border-radius:8px;font-size:14.7px;display:none}
+.fb.on{display:block}
+.fb.j{background:#F1F8F3;border-left:4px solid var(--ok)}
+.fb.n{background:#FBF2F2;border-left:4px solid var(--ko)}
+.fb .verdict{font-weight:800;display:block;margin-bottom:5px}
+.fb.j .verdict{color:var(--ok)}
+.fb.n .verdict{color:var(--ko)}
+.ref{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--gris-moyen);font-style:italic}
+.piege{margin-top:9px;padding:9px 12px;background:#FFF8E8;border-left:3px solid var(--amb);
+  border-radius:0 6px 6px 0;font-size:14px}
+.piege b{color:#8A6414}
+button{font-family:inherit;font-size:15px;font-weight:800;border:0;border-radius:8px;padding:12px 22px;
+  cursor:pointer;transition:opacity .15s,transform .05s}
+button:active{transform:translateY(1px)}
+button.principal{background:var(--prune);color:#fff}
+button.principal:hover{background:var(--prune-fonce)}
+button.principal:disabled{background:#D9CBD5;color:#fff;cursor:not-allowed}
+button.secondaire{background:#fff;color:var(--prune-fonce);border:1.5px solid var(--prune)}
+.barre-actions{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 0}
+.bilan{display:none;margin:28px 0 0;border-radius:12px;overflow:hidden;border:1px solid var(--filet);background:#fff}
+.bilan.on{display:block}
+.bilan .tete{padding:20px 24px;color:#fff;text-align:center}
+.bilan .tete .pct{font-family:Georgia,serif;font-size:40px;font-weight:700;line-height:1}
+.bilan .tete .lib{font-size:14px;letter-spacing:.11em;text-transform:uppercase;margin-top:6px;opacity:.92}
+.bilan .corps{padding:18px 24px;font-size:15px}
+.progression{height:7px;background:var(--filet);border-radius:4px;overflow:hidden;margin:22px 0 4px}
+.progression i{display:block;height:100%;background:var(--prune);width:0;transition:width .3s}
+.compteur{font-size:12.5px;color:var(--gris-moyen);text-align:right}
+textarea{width:100%;min-height:130px;font-family:inherit;font-size:15px;padding:12px 14px;
+  border:1.5px solid var(--filet);border-radius:8px;resize:vertical;
+  -webkit-user-select:text;-moz-user-select:text;user-select:text;background:#fff}
+textarea:focus{outline:0;border-color:var(--accent)}
+.attendu{display:none;margin-top:14px;padding:14px 16px;background:#F7F3F6;border-left:4px solid var(--prune);
+  border-radius:0 8px 8px 0;font-size:14.7px}
+.attendu.on{display:block}
+.attendu h4{margin:0 0 7px;font-family:Georgia,serif;font-size:15.5px;color:var(--prune-fonce)}
+.attendu ul{margin:8px 0 0;padding-left:20px}
+.attendu li{margin:3px 0}
+input[type=date],input[type=number]{font-family:inherit;font-size:15.5px;padding:9px 12px;border:1.5px solid var(--filet);
+  border-radius:8px;background:#fff;color:var(--vert);font-weight:700;
+  -webkit-user-select:text;-moz-user-select:text;user-select:text}
+input[type=number]{width:110px}
+input:focus{outline:0;border-color:var(--accent)}
+input.bon{border-color:var(--ok);background:#F1F8F3}
+input.faux{border-color:var(--ko);background:#FBF2F2}
+.ligne-reponse{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.ligne-reponse .unite{font-size:14.5px;color:var(--gris-moyen)}
+.reserve{display:flex;flex-wrap:wrap;gap:9px;padding:16px;background:#fff;border:1.5px dashed var(--accent);
+  border-radius:10px;min-height:64px;align-content:flex-start}
+.jeton{background:var(--prune-clair);border:1.5px solid var(--accent);color:var(--prune-fonce);
+  padding:8px 13px;border-radius:20px;font-size:14.3px;font-weight:700;cursor:grab;line-height:1.35;
+  max-width:100%}
+.jeton:active{cursor:grabbing}
+.jeton.actif{background:var(--prune);color:#fff;border-color:var(--prune-fonce);
+  box-shadow:0 0 0 3px rgba(140,30,112,.18)}
+.jeton.bon{background:#EAF5EE;border-color:var(--ok);color:#1E5334}
+.jeton.faux{background:#FBF2F2;border-color:var(--ko);color:#8C2626}
+.zones{display:grid;gap:14px;margin-top:16px}
+.zones.deux{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.zones.quatre{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.zone{background:#fff;border:1.5px solid var(--filet);border-radius:10px;padding:12px 14px;min-height:120px}
+.zone.survol{border-color:var(--prune);background:#FDF7FB}
+.zone h4{margin:0 0 4px;font-family:Georgia,serif;font-size:15.5px;color:var(--prune-fonce)}
+.zone .desc{font-size:12.7px;color:var(--gris-moyen);margin:0 0 10px;line-height:1.4}
+.zone .depot{display:flex;flex-wrap:wrap;gap:8px;min-height:44px}
+.aide{font-size:13.6px;color:var(--gris-moyen);margin-top:10px;font-style:italic}
+footer.pied{text-align:center;font-size:12.4px;color:var(--gris-moyen);padding:26px 18px 12px;
+  border-top:1px solid var(--filet);margin-top:44px}
+@media (max-width:560px){
+  h1{font-size:22px}
+  .carte{padding:16px 15px}
+  .wrap{padding:0 13px 44px}
+}
+</style>
+</head>
+<body>
+<header class="bandeau">
+  <div class="wrap">
+    <div class="chapitre">IOBSP Niveau 2 · Bloc 2 <span>/</span> Journée 3 — Module 1</div>
+    <h1>Exercice d'entraînement — module 1</h1>
+    <p class="sous">4 activités · les six thèmes du module · non noté, rien à déposer · environ 18 min</p>
+  </div>
+</header>
+<div class="wrap">
+<div class="consigne"><b>🎯 Exercice d'entraînement.</b> Quatre activités couvrant les six thèmes du module : affirmations à trancher, périmètre à classer, publicité à contrôler, régimes à dater. Aucune note n'est conservée et rien n'est à déposer — refaites-le autant de fois que nécessaire avant le QCM.</div>
+<div class="progression"><i id="jauge"></i></div>
+<div class="compteur" id="compteur">0 / 23 réponses</div>
+<div class="carte"><span class="etiq">Activité 1 — Vrai ou faux</span><div class="scenario">Sept affirmations. Tranchez avant de vérifier : c'est l'hésitation qui révèle le point à retravailler.</div>
+<div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">À compter du 20 novembre 2026, un crédit à la consommation de 90 € relève du régime protecteur.</p><ul class="opts"><li><label id="vl0_1"><input type="radio" name="vf0" value="1"><span>Vrai</span></label></li><li><label id="vl0_0"><input type="radio" name="vf0" value="0"><span>Faux</span></label></li></ul><div class="fb" id="vf0"></div></div>
+<div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Le plafond du crédit à la consommation reste fixé à 75 000 €.</p><ul class="opts"><li><label id="vl1_1"><input type="radio" name="vf1" value="1"><span>Vrai</span></label></li><li><label id="vl1_0"><input type="radio" name="vf1" value="0"><span>Faux</span></label></li></ul><div class="fb" id="vf1"></div></div>
+<div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Un artisan qui finance sa camionnette professionnelle bénéficie du régime du crédit à la consommation.</p><ul class="opts"><li><label id="vl2_1"><input type="radio" name="vf2" value="1"><span>Vrai</span></label></li><li><label id="vl2_0"><input type="radio" name="vf2" value="0"><span>Faux</span></label></li></ul><div class="fb" id="vf2"></div></div>
+<div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Un paiement en trois fois sans frais entre dans le champ du crédit à la consommation à compter du 20 novembre 2026.</p><ul class="opts"><li><label id="vl3_1"><input type="radio" name="vf3" value="1"><span>Vrai</span></label></li><li><label id="vl3_0"><input type="radio" name="vf3" value="0"><span>Faux</span></label></li></ul><div class="fb" id="vf3"></div></div>
+<div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">La mention légale peut être omise sur les supports où elle est techniquement difficile à afficher.</p><ul class="opts"><li><label id="vl4_1"><input type="radio" name="vf4" value="1"><span>Vrai</span></label></li><li><label id="vl4_0"><input type="radio" name="vf4" value="0"><span>Faux</span></label></li></ul><div class="fb" id="vf4"></div></div>
+<div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Le service de conseil est une obligation qui pèse sur tout intermédiaire de crédit.</p><ul class="opts"><li><label id="vl5_1"><input type="radio" name="vf5" value="1"><span>Vrai</span></label></li><li><label id="vl5_0"><input type="radio" name="vf5" value="0"><span>Faux</span></label></li></ul><div class="fb" id="vf5"></div></div>
+<div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Un contrat conclu le 3 novembre 2026 bascule automatiquement sous le nouveau régime le 20 novembre.</p><ul class="opts"><li><label id="vl6_1"><input type="radio" name="vf6" value="1"><span>Vrai</span></label></li><li><label id="vl6_0"><input type="radio" name="vf6" value="0"><span>Faux</span></label></li></ul><div class="fb" id="vf6"></div></div>
+</div>
+<div class="carte"><span class="etiq">Activité 2 — Le périmètre</span><div class="scenario">Neuf opérations. Régime applicable : celui en vigueur à compter du <b>20 novembre 2026</b>.</div><div class="reserve" id="reserveP" data-plateau="P"><div class="jeton" draggable="true" data-id="j1" data-plateau="P">Prêt personnel de 12 000 € à un particulier</div><div class="jeton" draggable="true" data-id="j2" data-plateau="P">Paiement en quatre fois d&#x27;un canapé, sans frais</div><div class="jeton" draggable="true" data-id="j3" data-plateau="P">Location avec option d&#x27;achat d&#x27;un véhicule</div><div class="jeton" draggable="true" data-id="j4" data-plateau="P">Mini-crédit de 150 € souscrit en ligne</div><div class="jeton" draggable="true" data-id="j5" data-plateau="P">Découvert autorisé sur un compte de dépôt</div><div class="jeton" draggable="true" data-id="j6" data-plateau="P">Prêt de 210 000 € pour la résidence principale</div><div class="jeton" draggable="true" data-id="j7" data-plateau="P">Crédit de 140 000 € pour des travaux, sans hypothèque</div><div class="jeton" draggable="true" data-id="j8" data-plateau="P">Location simple d&#x27;un matériel, sans option d&#x27;achat</div><div class="jeton" draggable="true" data-id="j9" data-plateau="P">Crédit-bail souscrit par une SARL pour son outillage</div></div><p class="aide">Faites glisser les étiquettes, ou touchez une étiquette puis la colonne.</p><div class="zones deux"><div class="zone" data-zone="dans" data-plateau="P"><h4>Dans le champ</h4><p class="desc">Régime protecteur du crédit à la consommation</p><div class="depot"></div></div><div class="zone" data-zone="hors" data-plateau="P"><h4>Hors du champ</h4><p class="desc">Autre régime, ou pas de crédit à la consommation</p><div class="depot"></div></div></div><div class="fb" id="fbP"></div></div>
+<div class="carte"><span class="etiq">Activité 3 — Contrôle d'une publicité</span><div class="scenario"><b>Publicité fictive — bandeau web</b><br><br>« <span style='font-size:18px;color:#8C1E70;font-weight:800'>CRÉDIT EXPRESS 5 000 €</span><br>Réponse garantie en 3 minutes. Sans justificatif.<br>Votre pouvoir d'achat retrouvé, dès aujourd'hui.<br>TAEG fixe à partir de 0,9 %. »<br><br><i>Document fictif à usage pédagogique.</i></div><p class="enonce">Cochez tous les manquements que présente ce bandeau — et rien d'autre. Le grief infondé compte comme une erreur.</p><ul class="opts"><li><label id="ml0"><input type="checkbox" name="m0"><span>La mention « Attention ! Un crédit coûte de l&#x27;argent et doit être remboursé » est absente</span></label></li><li><label id="ml1"><input type="checkbox" name="m1"><span>« Réponse garantie » suggère un crédit accordé sans examen de la situation</span></label></li><li><label id="ml2"><input type="checkbox" name="m2"><span>« Sans justificatif » entre en contradiction avec l&#x27;évaluation de solvabilité</span></label></li><li><label id="ml3"><input type="checkbox" name="m3"><span>« Votre pouvoir d&#x27;achat retrouvé » suggère que le crédit améliore la situation financière</span></label></li><li><label id="ml4"><input type="checkbox" name="m4"><span>Un taux est annoncé sans exemple représentatif</span></label></li><li><label id="ml5"><input type="checkbox" name="m5"><span>Le montant de 5 000 € est illicite car inférieur au plancher légal</span></label></li><li><label id="ml6"><input type="checkbox" name="m6"><span>La publicité pour un crédit à la consommation est interdite sur internet</span></label></li></ul><div class="fb" id="fbM"></div></div>
+<div class="carte"><span class="etiq">Activité 4 — Quel régime, à quelle date ?</span><div class="scenario">L'ordonnance n° 2025-880 entre en vigueur le <b>20 novembre 2026</b>. Pour chaque contrat, dites quel régime s'applique.</div><div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Prêt personnel conclu le <b>12 octobre 2026</b>, remboursable sur 48 mois. Le client vous interroge en 2028 sur ses droits.</p><ul class="opts"><li><label id="cl0_avant"><input type="radio" name="c0" value="avant"><span>Droit antérieur, jusqu'au terme du contrat</span></label></li><li><label id="cl0_apres"><input type="radio" name="c0" value="apres"><span>Régime issu de l'ordonnance n° 2025-880</span></label></li></ul><div class="fb" id="fc0"></div></div><div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Crédit affecté souscrit le <b>2 décembre 2026</b> pour l'achat d'un vélo électrique.</p><ul class="opts"><li><label id="cl1_avant"><input type="radio" name="c1" value="avant"><span>Droit antérieur, jusqu'au terme du contrat</span></label></li><li><label id="cl1_apres"><input type="radio" name="c1" value="apres"><span>Régime issu de l'ordonnance n° 2025-880</span></label></li></ul><div class="fb" id="fc1"></div></div><div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Crédit renouvelable ouvert le <b>5 septembre 2026</b>, reconduit chaque année.</p><ul class="opts"><li><label id="cl2_avant"><input type="radio" name="c2" value="avant"><span>Droit antérieur, jusqu'au terme du contrat</span></label></li><li><label id="cl2_apres"><input type="radio" name="c2" value="apres"><span>Régime issu de l'ordonnance n° 2025-880</span></label></li></ul><div class="fb" id="fc2"></div></div><div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Paiement en quatre fois accordé le <b>10 janvier 2027</b> sur un site marchand.</p><ul class="opts"><li><label id="cl3_avant"><input type="radio" name="c3" value="avant"><span>Droit antérieur, jusqu'au terme du contrat</span></label></li><li><label id="cl3_apres"><input type="radio" name="c3" value="apres"><span>Régime issu de l'ordonnance n° 2025-880</span></label></li></ul><div class="fb" id="fc3"></div></div><div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Prêt personnel conclu le <b>19 novembre 2026</b>, soit la veille de l'entrée en vigueur.</p><ul class="opts"><li><label id="cl4_avant"><input type="radio" name="c4" value="avant"><span>Droit antérieur, jusqu'au terme du contrat</span></label></li><li><label id="cl4_apres"><input type="radio" name="c4" value="apres"><span>Régime issu de l'ordonnance n° 2025-880</span></label></li></ul><div class="fb" id="fc4"></div></div><div style="margin:14px 0 0;padding-top:12px;border-top:1px solid #E8DCE5"><p class="enonce">Location avec option d'achat signée le <b>3 mars 2027</b>.</p><ul class="opts"><li><label id="cl5_avant"><input type="radio" name="c5" value="avant"><span>Droit antérieur, jusqu'au terme du contrat</span></label></li><li><label id="cl5_apres"><input type="radio" name="c5" value="apres"><span>Régime issu de l'ordonnance n° 2025-880</span></label></li></ul><div class="fb" id="fc5"></div></div></div>
+  <div class="bilan" id="bilan">
+    <div class="tete" id="bilan-tete">
+      <div class="pct" id="bilan-pct">0 %</div>
+      <div class="lib" id="bilan-lib"></div>
+    </div>
+    <div class="corps" id="bilan-corps"></div>
+  </div>
+  <div class="barre-actions">
+    <button class="principal" id="btn-valider">Vérifier mes réponses</button>
+    <button class="secondaire" id="btn-refaire">Refaire l'exercice</button>
+  </div>
+</div>
+<footer class="pied">TMK Performances - N° Siret : 49841924100027 - Code NAF : 8559A</footer>
+<script>
+/* Blocage du copier-coller (hors zones de rédaction du stagiaire) */
+(function(){
+  function libre(e){ var t=e.target; return t && t.tagName==='TEXTAREA'; }
+  ['copy','cut','contextmenu','dragstart'].forEach(function(ev){
+    document.addEventListener(ev,function(e){ if(!libre(e)) e.preventDefault(); });
+  });
+  document.addEventListener('keydown',function(e){
+    if(libre(e)) return;
+    var k=(e.key||'').toLowerCase();
+    if((e.ctrlKey||e.metaKey) && ['c','x','a','s','p','u'].indexOf(k)>-1) e.preventDefault();
+  });
+})();
+function palier(p){
+  if(p>=90) return {lib:'Excellent', c:'#2F7A4F'};
+  if(p>=70) return {lib:'Validé', c:'#3F7A5E'};
+  if(p>=50) return {lib:'À consolider', c:'#B5852A'};
+  return {lib:'À retravailler', c:'#B23B3B'};
+}
+function afficherBilan(bon,total,texte){
+  var p = total? Math.round(bon*100/total):0, pa=palier(p);
+  var b=document.getElementById('bilan');
+  document.getElementById('bilan-tete').style.background=pa.c;
+  document.getElementById('bilan-pct').textContent=p+' %';
+  document.getElementById('bilan-lib').textContent=pa.lib+' — '+bon+' / '+total;
+  document.getElementById('bilan-corps').innerHTML=texte;
+  b.classList.add('on');
+  b.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+
+var VF = [{"r": true, "e": "Exact. Le plancher de 200 € est supprimé à l'article L. 312-1 : le régime s'applique dès le premier euro.", "ref": "art. L. 312-1 C. consom., réd. ord. n° 2025-880"}, {"r": false, "e": "Faux. Il est porté à 100 000 €. Le seuil de l'article L. 314-6 suit le même relèvement.", "ref": "art. L. 312-1 et L. 314-6 C. consom."}, {"r": false, "e": "Faux. Le consommateur agit hors de son activité professionnelle. Le même artisan finançant la voiture familiale serait, lui, un consommateur : c'est la finalité de l'opération qui qualifie, pas le statut de la personne.", "ref": "art. liminaire et L. 312-1 C. consom."}, {"r": true, "e": "Exact. Les crédits de trois mois ou moins assortis de frais négligeables entrent dans le champ : information précontractuelle, évaluation de la solvabilité et droit de rétractation s'appliquent.", "ref": "ord. n° 2025-880 du 3 septembre 2025"}, {"r": false, "e": "Faux. Elle est due quel que soit le support, et doit être précise, visible et le cas échéant audible. Il n'existe pas de support mineur.", "ref": "art. L. 312-5 et L. 312-6 C. consom."}, {"r": false, "e": "Faux, et c'est le piège classique. Le conseil est facultatif — mais dès qu'il est fourni ou seulement annoncé, son régime s'applique intégralement. Ce qui est obligatoire, ce sont les explications adéquates.", "ref": "art. L. 312-15-1 et s. C. consom."}, {"r": false, "e": "Faux. Les contrats en cours au 20 novembre 2026 restent régis par le droit antérieur jusqu'à leur terme. Un crédit renouvelable ouvert avant la bascule vivra plusieurs années sous l'ancien régime.", "ref": "art. 99 de l'ord. n° 2025-880"}], JZ = {"j1": "dans", "j2": "dans", "j3": "dans", "j4": "dans", "j5": "dans", "j6": "hors", "j7": "dans", "j8": "hors", "j9": "hors"}, JL = {"j1": "Prêt personnel de 12 000 € à un particulier", "j2": "Paiement en quatre fois d'un canapé, sans frais", "j3": "Location avec option d'achat d'un véhicule", "j4": "Mini-crédit de 150 € souscrit en ligne", "j5": "Découvert autorisé sur un compte de dépôt", "j6": "Prêt de 210 000 € pour la résidence principale", "j7": "Crédit de 140 000 € pour des travaux, sans hypothèque", "j8": "Location simple d'un matériel, sans option d'achat", "j9": "Crédit-bail souscrit par une SARL pour son outillage"}, JE = {"j1": "Crédit consenti à un consommateur, dans les bornes de montant : régime protecteur.", "j2": "Durée de trois mois ou moins et frais négligeables : hier exclu, dans le champ à compter du 20 novembre 2026.", "j3": "La LOA est expressément intégrée au régime par la réforme.", "j4": "Le plancher de 200 € étant supprimé, les mini-crédits entrent dans le champ.", "j5": "Le découvert est traité comme une opération de crédit à la consommation.", "j6": "Financement de l'acquisition d'un immeuble d'habitation : régime distinct du crédit immobilier.", "j7": "Crédit travaux sans garantie hypothécaire : il reste dans le champ, même au-delà de 100 000 € (exception de l'art. L. 312-4, 3°).", "j8": "Sans option d'achat, il n'y a pas de crédit : simple contrat de location.", "j9": "L'emprunteur est une personne morale : il n'est pas un consommateur."}, MM = [{"ok": true, "e": "Mention obligatoire quel que soit le support, précise et visible.", "t": "La mention « Attention ! Un crédit coûte de l'argent et doit être remboursé » est absente"}, {"ok": true, "e": "Formulation interdite : elle contredit l'obligation d'évaluer la solvabilité.", "t": "« Réponse garantie » suggère un crédit accordé sans examen de la situation"}, {"ok": true, "e": "Même logique : la publicité ne peut pas suggérer l'absence de vérification.", "t": "« Sans justificatif » entre en contradiction avec l'évaluation de solvabilité"}, {"ok": true, "e": "Formulation interdite : le crédit n'est ni une ressource ni une amélioration de la situation.", "t": "« Votre pouvoir d'achat retrouvé » suggère que le crédit améliore la situation financière"}, {"ok": true, "e": "Dès qu'un chiffre de coût apparaît, les informations chiffrées doivent être présentées au moyen d'un exemple représentatif.", "t": "Un taux est annoncé sans exemple représentatif"}, {"ok": false, "e": "Il n'existe plus de plancher de montant, et 5 000 € entrait de toute façon dans les bornes antérieures.", "t": "Le montant de 5 000 € est illicite car inférieur au plancher légal"}, {"ok": false, "e": "Elle est autorisée sur tout support, à condition d'en respecter les règles.", "t": "La publicité pour un crédit à la consommation est interdite sur internet"}], CS = [{"r": "avant", "e": "Contrat en cours au 20 novembre 2026 : il reste régi par le droit antérieur jusqu'à son terme, soit jusqu'en 2030."}, {"r": "apres", "e": "Conclu après la bascule : régime issu de l'ordonnance n° 2025-880."}, {"r": "avant", "e": "C'est le cas le plus discuté. Le contrat est en cours au 20 novembre 2026 : il reste sous le droit antérieur, y compris lors des reconductions ultérieures."}, {"r": "apres", "e": "Opération conclue après la bascule, et désormais dans le champ du crédit à la consommation : le régime nouveau s'applique intégralement."}, {"r": "avant", "e": "La veille compte encore comme l'ancien monde : l'ordonnance entre en vigueur le 20 novembre. Un jour d'écart change le régime."}, {"r": "apres", "e": "Conclue après la bascule, et la LOA fait désormais partie du champ : régime nouveau."}];
+var ZL = {dans:"Dans le champ", hors:"Hors du champ"};
+var LREG = {avant:"Droit antérieur, jusqu'au terme du contrat", apres:"Régime issu de l'ordonnance n° 2025-880"};
+var NJ = Object.keys(JZ).length, valide = false, actif = null;
+var TOTAL = VF.length + NJ + 1 + CS.length;
+
+function placesJ(){ return document.querySelectorAll('.zone .depot .jeton').length; }
+function progresse(){
+  var n = 0;
+  for(var i=0;i<VF.length;i++){ if(document.querySelector('input[name="vf'+i+'"]:checked')) n++; }
+  n += placesJ();
+  if(document.querySelectorAll('input[type=checkbox]:checked').length > 0) n += 1;
+  for(var k=0;k<CS.length;k++){ if(document.querySelector('input[name="c'+k+'"]:checked')) n++; }
+  document.getElementById('jauge').style.width = Math.round(n*100/TOTAL)+'%';
+  document.getElementById('compteur').textContent = n+' / '+TOTAL+' réponses';
+  document.getElementById('btn-valider').disabled = (n < TOTAL) || (placesJ() !== NJ) || valide;
+}
+document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(function(x){
+  x.addEventListener('change', progresse);
+});
+function deselect(){ if(actif){ actif.classList.remove('actif'); actif = null; } }
+function deposer(j, c){ if(valide) return; c.appendChild(j); deselect(); progresse(); }
+var res = document.getElementById('reserveP');
+document.querySelectorAll('.jeton').forEach(function(j){
+  j.addEventListener('click', function(e){
+    if(valide) return; e.stopPropagation();
+    if(actif && actif !== j){
+      var c = j.parentElement;
+      if(c.classList.contains('depot') || c.classList.contains('reserve')){ deposer(actif, c); return; }
+    }
+    if(j.parentElement.classList.contains('depot')){ deposer(j, res); return; }
+    if(actif === j){ deselect(); return; }
+    deselect(); actif = j; j.classList.add('actif');
+  });
+  j.addEventListener('dragstart', function(e){
+    if(valide){ e.preventDefault(); return; }
+    actif = j; e.dataTransfer.setData('text/plain', j.dataset.id);
+  });
+});
+document.querySelectorAll('.zone').forEach(function(z){
+  var dep = z.querySelector('.depot');
+  z.addEventListener('dragover', function(e){ if(!valide){ e.preventDefault(); z.classList.add('survol'); } });
+  z.addEventListener('dragleave', function(){ z.classList.remove('survol'); });
+  z.addEventListener('drop', function(e){ e.preventDefault(); z.classList.remove('survol'); if(actif) deposer(actif, dep); });
+  z.addEventListener('click', function(){ if(actif) deposer(actif, dep); });
+});
+res.addEventListener('dragover', function(e){ if(!valide) e.preventDefault(); });
+res.addEventListener('drop', function(e){ e.preventDefault(); if(actif) deposer(actif, res); });
+res.addEventListener('click', function(){ if(actif) deposer(actif, res); });
+document.body.addEventListener('click', deselect);
+
+document.getElementById('btn-valider').addEventListener('click', function(e){
+  e.stopPropagation();
+  if(valide) return; valide = true; deselect();
+  var bon = 0;
+  // activité 1
+  for(var i=0;i<VF.length;i++){
+    var ch = document.querySelector('input[name="vf'+i+'"]:checked');
+    var rep = ch ? (ch.value === '1') : null, juste = (rep === VF[i].r);
+    if(juste) bon++;
+    document.getElementById('vl'+i+'_'+(VF[i].r?1:0)).classList.add('bonne');
+    if(!juste && ch) document.getElementById('vl'+i+'_'+ch.value).classList.add('mauvaise');
+    document.querySelectorAll('input[name="vf'+i+'"]').forEach(function(r){ r.disabled = true; });
+    var f = document.getElementById('vf'+i);
+    f.innerHTML = '<span class="verdict">'+(juste?'✓ Exact':'✗ Inexact')+'</span>'+VF[i].e
+                + '<span class="ref">'+VF[i].ref+'</span>';
+    f.className = 'fb on '+(juste?'j':'n');
+  }
+  // activité 2
+  var bonJ = 0, li = '';
+  Object.keys(JZ).forEach(function(id){
+    var j = document.querySelector('.jeton[data-id="'+id+'"]');
+    var z = j.closest('.zone'), juste = z && z.dataset.zone === JZ[id];
+    j.classList.add(juste?'bon':'faux'); j.setAttribute('draggable','false');
+    if(juste) bonJ++; else li += '<li><b>'+JL[id]+'</b> → '+ZL[JZ[id]]+'. '+JE[id]+'</li>';
+  });
+  bon += bonJ;
+  var fp = document.getElementById('fbP');
+  fp.innerHTML = '<span class="verdict">'+(bonJ===NJ?'✓ Périmètre entièrement maîtrisé':'✗ '+bonJ+' / '+NJ+' bien classées')+'</span>'
+    + (li ? '<b>À corriger :</b><ul style="margin:8px 0 0;padding-left:20px">'+li+'</ul>'
+          : 'Chaque opération est du bon côté de la frontière.');
+  fp.className = 'fb on '+(bonJ===NJ?'j':'n');
+  // activité 3
+  var justeM = true, det = '';
+  for(var k=0;k<MM.length;k++){
+    var c = document.querySelector('input[name="m'+k+'"]');
+    var coche = c.checked; c.disabled = true;
+    var l = document.getElementById('ml'+k);
+    if(MM[k].ok) l.classList.add('bonne');
+    if(coche !== MM[k].ok){
+      justeM = false;
+      if(coche) l.classList.add('mauvaise');
+      det += '<li><b>'+MM[k].t+'</b> — '+(MM[k].ok?'ce manquement était à cocher.':'ne devait pas être coché.')+' '+MM[k].e+'</li>';
+    }
+  }
+  if(justeM) bon++;
+  var fm = document.getElementById('fbM');
+  fm.innerHTML = '<span class="verdict">'+(justeM?'✓ Contrôle complet et sans excès':'✗ Contrôle incomplet ou trop large')+'</span>'
+    + (det ? '<ul style="margin:8px 0 0;padding-left:20px">'+det+'</ul>'
+           : "Les cinq manquements sont identifiés, et aucun grief infondé n'a été ajouté.")
+    + '<span class="ref">art. L. 312-5 et L. 312-6 C. consom.</span>';
+  fm.className = 'fb on '+(justeM?'j':'n');
+  // activité 4
+  for(var m=0;m<CS.length;m++){
+    var ch2 = document.querySelector('input[name="c'+m+'"]:checked');
+    var val = ch2 ? ch2.value : null, ok2 = (val === CS[m].r);
+    if(ok2) bon++;
+    document.getElementById('cl'+m+'_'+CS[m].r).classList.add('bonne');
+    if(!ok2 && val) document.getElementById('cl'+m+'_'+val).classList.add('mauvaise');
+    document.querySelectorAll('input[name="c'+m+'"]').forEach(function(r){ r.disabled = true; });
+    var f2 = document.getElementById('fc'+m);
+    var h = '<span class="verdict">'+(ok2?'✓ Exact':'✗ Inexact')+'</span>';
+    if(!ok2) h += '<div style="margin-bottom:6px"><b>Régime applicable :</b> '+LREG[CS[m].r]+'</div>';
+    h += CS[m].e + '<span class="ref">art. 99 de l\'ord. n° 2025-880 du 3 septembre 2025</span>';
+    f2.innerHTML = h;
+    f2.className = 'fb on '+(ok2?'j':'n');
+  }
+  document.getElementById('btn-valider').disabled = true;
+  document.getElementById('btn-valider').textContent = 'Atelier validé';
+  afficherBilan(bon, TOTAL,
+    'Cet exercice n\'est pas noté et ne laisse aucune trace : refaites-le autant de fois que nécessaire. '
+    + 'Quand les quatre activités passent sans hésitation, enchaînez sur le <b>QCM du module 1</b>.');
+});
+progresse();
+
+document.getElementById('btn-refaire').addEventListener('click',function(){ location.reload(); });
+</script>
+</body>
+</html>
